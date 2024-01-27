@@ -1,19 +1,45 @@
-import React from 'react'
-import img from '../assets/swag_cat.jpg'
+import React, { useState } from "react";
+import { formatISO9075 } from "date-fns";
 
-const Posts = () => {
+const Posts = ({ title, summary, image, author, createdAt }) => {
+  const source = image.split("\\");
+  const imageId = source[source.length - 1];
+  const { username } = author;
+  const toShow = summary.substring(0, 120) + "...";
+  const date = new Date();
+  // Sat Jan 27 2024 11:56:57 GMT+0530 (India Standard Time)
+  console.log(date);
+  var heading = "";
+  if (title.length > 60) {
+    heading = title.substring(0, 60) + "...";
+  } else {
+    heading = title;
+  }
+  let abc = `"src={"http://localhost:5000/uploads/"+imageId}"`;
+
   return (
-    <div className='flex '>
-        <div>
-            <img src="https://hips.hearstapps.com/hmg-prod/images/beautiful-smooth-haired-red-cat-lies-on-the-sofa-royalty-free-image-1678488026.jpg?crop=1xw:0.84415xh;center,top" alt="" srcset="" className="object-cover h-48 w-96 ..."/>
+    <>
+      <div class="max-w-sm rounded overflow-hidden shadow-lg">
+        <img
+          class="object-cover h-48 w-full"
+          src={"http://localhost:5000/uploads/" + imageId}
+          alt="Sunset in the mountains"
+        />
+        <div class="px-6 py-4">
+          <div class="font-bold text-xl mb-2">{heading}</div>
+          <p class="text-gray-700 text-base">{toShow}</p>
         </div>
-      <div>
-        <h2 className='decoration-double'>Image of a Cat</h2>
-      <h3>Created by Harshavardanan @12-12-12</h3>
-      <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Qui, natus explicabo reiciendis quas quaerat doloremque id porro laudantium, officiis quo assumenda fuga? Vitae fugit, repudiandae doloremque odit optio impedit libero.</p>
+        <div class="px-6 pt-4 pb-2">
+          <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+            {username}
+          </span>
+          <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+            {formatISO9075(new Date(createdAt))}
+          </span>
+        </div>
       </div>
-    </div>
-  )
-}
+    </>
+  );
+};
 
-export default Posts
+export default Posts;

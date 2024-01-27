@@ -12,6 +12,7 @@ const secret = "ajkdhklnrfewbc2342nkjsdc";
 const multer = require("multer");
 const uploads = multer({ dest: "uploads/" });
 const fs = require("fs");
+const Post = require("./Models/PostSchema");
 
 app.use(
   cors({
@@ -21,6 +22,7 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.json());
+app.use("/uploads", express.static(__dirname + "/uploads"));
 // Register Page
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
@@ -55,7 +57,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/profile", (req, res) => {
-  const { token } = req.cookie;
+  const { token } = req.cookies;
   jwt.verify(token, secret, {}, (err, authData) => {
     if (err) throw err;
     res.json(authData);
@@ -66,22 +68,32 @@ app.post("/logout", (req, res) => {
   res.cookie("token", "").json("ok");
 });
 
-app.post("/post", uploads.single("image"), (req, res) => {
+app.post("/post", uploads.single("image"), async (req, res) => {
   const { originalname, path, filename } = req.file;
   const parts = originalname.split(".");
   const extension = parts[parts.length - 1];
-  console.log(originalname, path, filename);
-  fs.renameSync(path, path + "." + extension);
+  const filepath = path + "." + extension;
+  fs.renameSync(path, filepath);
 
-  res.json({
-    image: req.image,
-    title: req.title,
-    summary: req.summary,
-    content: req.content,
-    files: req.file,
+  const { token } = req.cookies;
+  jwt.verify(token, secret, {}, async (err, authData) => {
+    if (err) throw err;
+    const { title, summary, content } = req.body;
+    const newPost = await Post.create({
+      title,
+      summary,
+      content,
+      image: filepath,
+      author: authData.id,
+    });
+    res.json(newPost);
   });
 });
 
+app.get("/post", async (req, res) => {
+  const authorData = await Post.find().populate("author", ["username"]);
+  res.json(authorData);
+});
 mongoose
   .connect(
     "mongodb+srv://blogapp:luP5lnbHAx80kODG@cluster0.kffjo.mongodb.net/?retryWrites=true&w=majority"
