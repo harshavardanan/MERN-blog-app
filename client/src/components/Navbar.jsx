@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { UserContext } from "../UserContext";
 
 const Navbar = () => {
   const { setUserInfo, userInfo } = useContext(UserContext);
+  const [redirect, setRedirect] = useState(false);
 
   useEffect(async () => {
     await fetch("http://localhost:5000/profile", {
@@ -19,8 +20,9 @@ const Navbar = () => {
     fetch("http://localhost:5000/logout", {
       credentials: "include",
       method: "POST",
-    });
-    setUserInfo(null);
+    })
+      .then(setUserInfo(null))
+      .then(setRedirect(true));
   }
 
   const username = userInfo?.username;
@@ -61,7 +63,7 @@ const Navbar = () => {
                   class="md:p-4 py-2 block hover:text-purple-400 text-white-500"
                   onClick={logout}
                 >
-                  Logout({username})
+                  Logout( {username} )
                 </button>
               </li>
             </>

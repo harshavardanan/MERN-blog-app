@@ -1,32 +1,37 @@
 import React, { useState } from "react";
 import { formatISO9075 } from "date-fns";
+import { Link } from "react-router-dom";
 
-const Posts = ({ title, summary, image, author, createdAt }) => {
+const Posts = ({ _id, title, summary, image, author, createdAt }) => {
   const source = image.split("\\");
   const imageId = source[source.length - 1];
   const { username } = author;
   const toShow = summary.substring(0, 120) + "...";
   const date = new Date();
   // Sat Jan 27 2024 11:56:57 GMT+0530 (India Standard Time)
-  console.log(date);
+  //console.log(date);
   var heading = "";
   if (title.length > 60) {
     heading = title.substring(0, 60) + "...";
   } else {
     heading = title;
   }
-  let abc = `"src={"http://localhost:5000/uploads/"+imageId}"`;
+  //let abc = `"src={"http://localhost:5000/uploads/"+imageId}"`;
 
   return (
     <>
-      <div class="max-w-sm rounded overflow-hidden shadow-lg">
-        <img
-          class="object-cover h-48 w-full"
-          src={"http://localhost:5000/uploads/" + imageId}
-          alt="Sunset in the mountains"
-        />
+      <div class="max-w-sm rounded overflow-hidden shadow-lg ">
+        <Link to={`/post/${_id}`}>
+          <img
+            class="object-cover h-48 w-full"
+            src={"http://localhost:5000/uploads/" + imageId}
+            alt="Sunset in the mountains"
+          />
+        </Link>
         <div class="px-6 py-4">
-          <div class="font-bold text-xl mb-2">{heading}</div>
+          <Link to={`/post/${_id}`}>
+            <div class="font-bold text-xl mb-2">{heading}</div>
+          </Link>
           <p class="text-gray-700 text-base">{toShow}</p>
         </div>
         <div class="px-6 pt-4 pb-2">

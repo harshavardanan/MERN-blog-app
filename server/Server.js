@@ -94,6 +94,12 @@ app.get("/post", async (req, res) => {
   const authorData = await Post.find().populate("author", ["username"]);
   res.json(authorData);
 });
+
+app.get("/post/:id", async (req, res) => {
+  const { id } = req.params;
+  const postData = await Post.findById(id).populate("author", ["username"]);
+  res.json(postData);
+});
 mongoose
   .connect(
     "mongodb+srv://blogapp:luP5lnbHAx80kODG@cluster0.kffjo.mongodb.net/?retryWrites=true&w=majority"
