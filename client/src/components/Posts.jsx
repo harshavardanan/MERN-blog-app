@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { formatISO9075 } from "date-fns";
 import { Link } from "react-router-dom";
+import { UserContext } from "../UserContext";
 
 const Posts = ({ _id, title, summary, image, author, createdAt }) => {
   const source = image.split("\\");
@@ -10,6 +11,7 @@ const Posts = ({ _id, title, summary, image, author, createdAt }) => {
   const date = new Date();
   // Sat Jan 27 2024 11:56:57 GMT+0530 (India Standard Time)
   //console.log(date);
+  const { userInfo } = useContext(UserContext);
   var heading = "";
   if (title.length > 60) {
     heading = title.substring(0, 60) + "...";
@@ -17,7 +19,12 @@ const Posts = ({ _id, title, summary, image, author, createdAt }) => {
     heading = title;
   }
   //let abc = `"src={"http://localhost:5000/uploads/"+imageId}"`;
-
+  // const [currUser, setCurrUser] = useState(false);
+  // const userID = userInfo?.id;
+  // const authID = author?._id;
+  // if (userID === authID) {
+  //   setCurrUser(true);
+  // }
   return (
     <>
       <div class="max-w-sm rounded overflow-hidden shadow-lg ">

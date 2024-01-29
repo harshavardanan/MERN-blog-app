@@ -1,13 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../UserContext";
+import { ENDPOINT } from "../App";
+//import { useHistory } from "react-router-dom";
 
 const Navbar = () => {
   const { setUserInfo, userInfo } = useContext(UserContext);
-  const [redirect, setRedirect] = useState(false);
+  //const [redirect, setRedirect] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(async () => {
-    await fetch("http://localhost:5000/profile", {
+    await fetch(`${ENDPOINT}/profile`, {
       credentials: "include",
     }).then((res) => {
       res.json().then((userInfo) => {
@@ -17,12 +20,11 @@ const Navbar = () => {
   }, []);
 
   function logout() {
-    fetch("http://localhost:5000/logout", {
+    fetch(`${ENDPOINT}/logout`, {
       credentials: "include",
       method: "POST",
-    })
-      .then(setUserInfo(null))
-      .then(setRedirect(true));
+    }).then(setUserInfo(null));
+    navigate("/");
   }
 
   const username = userInfo?.username;

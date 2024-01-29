@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Posts from "./Posts";
+import { ENDPOINT } from "../App";
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
+  const [user, setUser] = useState("");
   useEffect(() => {
-    fetch("http://localhost:5000/post").then((res) => {
+    fetch(`${ENDPOINT}/post`).then((res) => {
       res.json().then((data) => {
         setPosts(data);
       });
     });
-  }, []);
+  }, [posts]);
 
   return (
     <>

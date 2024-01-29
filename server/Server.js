@@ -10,7 +10,13 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const secret = "ajkdhklnrfewbc2342nkjsdc";
 const multer = require("multer");
-const uploads = multer({ dest: "uploads/" });
+const uploads = multer({
+  dest: "uploads/",
+  limits: {
+    fieldNameSize: 100, // Increase the limit according to your requirements
+    fieldSize: 10 * 1024 * 1024, // Increase the limit according to your requirements (10MB in this example)
+  },
+});
 const fs = require("fs");
 const Post = require("./Models/PostSchema");
 
@@ -69,7 +75,7 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/post", uploads.single("image"), async (req, res) => {
-  const { originalname, path, filename } = req.file;
+  const { originalname, path } = req.file;
   const parts = originalname.split(".");
   const extension = parts[parts.length - 1];
   const filepath = path + "." + extension;
@@ -90,8 +96,42 @@ app.post("/post", uploads.single("image"), async (req, res) => {
   });
 });
 
+app.put("/post", uploads.single("image"), async (req, res) => {
+  let newPath = null;
+  if (req.file) {
+    const { originalname, path } = req.file;
+    const parts = originalname.split(".");
+    const ext = parts[parts.length - 1];
+    newPath = path + "." + ext;
+    fs.renameSync(path, newPath);
+  }
+
+  const { token } = req.cookies;
+  jwt.verify(token, secret, {}, async (err, info) => {
+    if (err) throw err;
+    const { id, title, summary, content } = req.body;
+    const postDoc = await Post.findById(id);
+    const isAuthor = JSON.stringify(postDoc.author) === JSON.stringify(info.id);
+    if (!isAuthor) {
+      return res.status(400).json("you are not the author");
+    }
+
+    await postDoc.updateOne({
+      title,
+      summary,
+      content,
+      image: newPath ? newPath : postDoc.image,
+    });
+
+    res.json(postDoc);
+  });
+});
+
 app.get("/post", async (req, res) => {
-  const authorData = await Post.find().populate("author", ["username"]);
+  const authorData = await Post.find()
+    .populate("author", ["username"])
+    .sort({ createdAt: -1 })
+    .limit(15);
   res.json(authorData);
 });
 
@@ -100,6 +140,7 @@ app.get("/post/:id", async (req, res) => {
   const postData = await Post.findById(id).populate("author", ["username"]);
   res.json(postData);
 });
+
 mongoose
   .connect(
     "mongodb+srv://blogapp:luP5lnbHAx80kODG@cluster0.kffjo.mongodb.net/?retryWrites=true&w=majority"

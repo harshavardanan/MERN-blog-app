@@ -7,6 +7,8 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import PostReader from "./components/PostReader";
 import { UserProvider } from "./UserContext";
+import EditPost from "./components/EditPost";
+export const ENDPOINT = "http://localhost:5000";
 
 const App = () => {
   return (
@@ -29,6 +31,7 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/write" element={<TextEditor />} />
           <Route path="/post/:id" element={<PostReader />} />
+          <Route path="/edit/:id" element={<EditPost />} />
         </Routes>
       </UserProvider>
     </div>
