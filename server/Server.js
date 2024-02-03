@@ -17,12 +17,13 @@ const uploads = multer({
     fieldSize: 10 * 1024 * 1024, // Increase the limit according to your requirements (10MB in this example)
   },
 });
+
 const fs = require("fs");
 const Post = require("./Models/PostSchema");
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "*",
     credentials: true,
   })
 );
@@ -127,6 +128,16 @@ app.put("/post", uploads.single("image"), async (req, res) => {
   });
 });
 
+app.delete("/post/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const removePost = await Post.deleteOne({ _id: id });
+    res.json(removePost);
+  } catch (err) {
+    res.json({ message: err });
+  }
+});
 app.get("/post", async (req, res) => {
   const authorData = await Post.find()
     .populate("author", ["username"])

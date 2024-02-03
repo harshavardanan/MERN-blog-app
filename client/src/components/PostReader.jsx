@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { formatISO9075 } from "date-fns";
 import { ENDPOINT } from "../App";
 import { UserContext } from "../UserContext";
@@ -7,6 +7,7 @@ import { UserContext } from "../UserContext";
 const PostReader = () => {
   const params = useParams();
   const [postData, setPostData] = useState("");
+  const navigate = useNavigate();
   //const [isCurrUser, setCurrUser] = useState(false);
   const { userInfo } = useContext(UserContext);
   const { id } = params;
@@ -22,7 +23,26 @@ const PostReader = () => {
 
   const { title, summary, image, content, author, createdAt } = postData;
 
-  const deletePost = () => {};
+  const deletePost = () => {
+    var answer = window.confirm("Are you sure to delete post?");
+    if (answer) {
+      fetch(`${ENDPOINT}/post/${id}`, {
+        method: "DELETE",
+      })
+        .then((res) => {
+          if (res.ok) {
+            navigate("/");
+          } else {
+            console.error("Failed to delete post");
+          }
+        })
+        .catch((err) => {
+          console.error("Cannot delete post", err);
+        });
+    } else {
+      return null;
+    }
+  };
 
   if (!postData) return <div>Loading...</div>;
 
@@ -36,11 +56,25 @@ const PostReader = () => {
           Created by {author.username} at {formatISO9075(new Date(createdAt))}
         </p>
         {userInfo.id === author._id && (
-          <div>
-            <Link to={`/edit/${postData._id}`}>
-              <button>Edit Post</button>
-            </Link>
-            <button onClick={deletePost}>Delete</button>
+          <div class="flex justify-center items-center">
+            <div class="card-body p-4">
+              <div class="btn-group">
+                <Link to={`/edit/${postData._id}`}>
+                  <button
+                    type="button"
+                    class="btn-primary transition duration-300 ease-in-out focus:outline-none focus:shadow-outline bg-purple-700 hover:bg-purple-900 text-white font-normal py-2 px-4 mr-1 rounded"
+                  >
+                    Edit Article
+                  </button>
+                </Link>
+                <button
+                  onClick={deletePost}
+                  class="btn-outline-primary transition duration-300 ease-in-out focus:outline-none focus:shadow-outline border border-purple-700 hover:bg-purple-700 text-purple-700 hover:text-white font-normal py-2 px-4 rounded"
+                >
+                  Delete Article
+                </button>
+              </div>
+            </div>
           </div>
         )}
         <div class="flex justify-center items-center h-100 w-100">
