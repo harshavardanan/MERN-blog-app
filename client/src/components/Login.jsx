@@ -8,7 +8,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const { setUserInfo } = useContext(UserContext);
   const [redirect, setRedirect] = useState(false);
-  
 
   const login = async (ev) => {
     ev.preventDefault();
